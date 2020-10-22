@@ -21,7 +21,7 @@ async function youtube(query, page) {
 
                 // If that fails, we have to parse new format from json data in html script tag
                 if (!json.results.length) {
-                    json["parser"] = "json_format";
+                    json["parser"] = "json_format.scraper_data";
 
                     // Get script json data from html to parse
                     let data, sectionLists = [];
