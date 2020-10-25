@@ -91,30 +91,33 @@ async function youtube(query, key, pageToken) {
  * @returns object with data to return for this video
  */
 function parseOldFormat($, vid) {
+    // Get user details
+    let $byline = $(vid).find(".yt-lockup-byline");
     // Get video details
     let $metainfo = $(vid).find(".yt-lockup-meta-info li");
     let $thumbnail = $(vid).find(".yt-thumb img");
     let video = {
         "id": $(vid).parent().data("context-item-id"),
         "title": $(vid).find(".yt-lockup-title").children().first().text(),
-        "url": `https://www.youtube.com${$(vid).find(".yt-lockup-title").children().first().attr("href")}`,
+        "link": `https://www.youtube.com${$(vid).find(".yt-lockup-title").children().first().attr("href")}`,
         "duration": $(vid).find(".video-time").text().trim() || "Playlist",
         "snippet": $(vid).find(".yt-lockup-description").text(),
-        "upload_date": $metainfo.first().text(),
+        "release_date": $metainfo.first().text(),
         "thumbnail_src": $thumbnail.data("thumb") || $thumbnail.attr("src"),
-        "views": $metainfo.last().text()
+        "num_views": $metainfo.last().text(),
+        "channel": $byline.text(),
+        "channel_link": `https://www.youtube.com${$byline.find("a").attr("href")}`,
     };
 
-    // Get user details
-    let $byline = $(vid).find(".yt-lockup-byline");
-    let uploader = {
-        "username": $byline.text(),
-        "url": `https://www.youtube.com${$byline.find("a").attr("href")}`,
-        "verified": !!$byline.find("[title=Verified]").length
-    };
+    // let uploader = {
+    //     "username": $byline.text(),
+    //     "url": `https://www.youtube.com${$byline.find("a").attr("href")}`,
+    //     "verified": !!$byline.find("[title=Verified]").length
+    // };
 
-    // Return json
-    return { video: video, uploader: uploader };
+    // // Return json
+    // return { video: video, uploader: uploader };
+    return video
 }
 
 /**
@@ -128,18 +131,18 @@ function parseJsonFormat(contents, json) {
             if (sectionList.hasOwnProperty("itemSectionRenderer")) {
                 sectionList.itemSectionRenderer.contents.forEach(content => {
                     try {
-                        if (content.hasOwnProperty("channelRenderer")) {
-                            json.results.push(parseChannelRenderer(content.channelRenderer));
-                        }
+                        // if (content.hasOwnProperty("channelRenderer")) {
+                        //     json.results.push(parseChannelRenderer(content.channelRenderer));
+                        // }
                         if (content.hasOwnProperty("videoRenderer")) {
                             json.results.push(parseVideoRenderer(content.videoRenderer));
                         }
-                        if (content.hasOwnProperty("radioRenderer")) {
-                            json.results.push(parseRadioRenderer(content.radioRenderer));
-                        }
-                        if (content.hasOwnProperty("playlistRenderer")) {
-                            json.results.push(parsePlaylistRenderer(content.playlistRenderer));
-                        }
+                        // if (content.hasOwnProperty("radioRenderer")) {
+                        //     json.results.push(parseRadioRenderer(content.radioRenderer));
+                        // }
+                        // if (content.hasOwnProperty("playlistRenderer")) {
+                        //     json.results.push(parsePlaylistRenderer(content.playlistRenderer));
+                        // }
                     }
                     catch(ex) {
                         console.error("Failed to parse renderer:", ex);
@@ -239,22 +242,24 @@ function parseVideoRenderer(renderer) {
         "snippet": renderer.descriptionSnippet ?
                    renderer.descriptionSnippet.runs.reduce((a, b) => a + (b.bold ? `<b>${b.text}</b>` : b.text), ""):
                    "",
+        "channel": renderer.ownerText.runs[0].text,
+        "channel_link": `https://www.youtube.com${renderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
         "release_date": renderer.publishedTimeText ? renderer.publishedTimeText.simpleText : "Live",
         "num_views": renderer.viewCountText ?
             renderer.viewCountText.simpleText || renderer.viewCountText.runs.reduce(comb, "") :
             (renderer.publishedTimeText ? "0 views" : "0 watching")
     };
-    console.log("+++++++++++++++", renderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer);
 
-    let uploader = {
-        "username": renderer.ownerText.runs[0].text,
-        "url": `https://www.youtube.com${renderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
-    };
-    uploader.verified = renderer.ownerBadges &&
-        renderer.ownerBadges.some(badge => badge.metadataBadgeRenderer.style.indexOf("VERIFIED") > -1) || 
-        false;
+    // let uploader = {
+    //     "username": renderer.ownerText.runs[0].text,
+    //     "url": `https://www.youtube.com${renderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url}`
+    // };
+    // uploader.verified = renderer.ownerBadges &&
+    //     renderer.ownerBadges.some(badge => badge.metadataBadgeRenderer.style.indexOf("VERIFIED") > -1) || 
+    //     false;
 
-    return { video: video, uploader: uploader };
+    // return { video: video, uploader: uploader };
+    return video
 }
 
 /**
