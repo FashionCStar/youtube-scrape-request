@@ -125,11 +125,6 @@ function parseOldFormat($, vid) {
  */
 function parseJsonFormat(contents, json) {
     console.log("++++++++++++++parse json format");
-    fs.writeFile('json-contents.json', contents, (error) => { 
-        console.log("errorrrrr", error); 
-        if (error) throw error;
-            console.log('saved file');
-    });
     contents.forEach(sectionList => {
         try {
             if (sectionList.hasOwnProperty("itemSectionRenderer")) {
@@ -237,6 +232,11 @@ function parseRadioRenderer(renderer) {
  * @returns object with data to return for this video
  */
 function parseVideoRenderer(renderer) {
+    fs.writeFile('json-videorender.json', renderer, (error) => { 
+        console.log("errorrrrr", error); 
+        if (error) throw error;
+            console.log('saved file');
+    });
     let video = {
         "id": renderer.videoId,
         "title": renderer.title.runs.reduce(comb, ""),
