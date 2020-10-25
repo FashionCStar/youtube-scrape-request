@@ -1,6 +1,11 @@
 const express = require('express');
-const scraper = require('./scraper')
+const scraper = require('./scraper');
+const cors = require('cors');
 const app = express();
+app.use(cors());
+// var timeout = express.timeout // express v3 and below
+var timeout = require('connect-timeout'); //express v4
+
 
 //Home page
 app.get('/', (req, res) => {
@@ -14,6 +19,7 @@ app.get('/api/search', (req, res) => {
         .catch(e => res.send(e));
 });
 
+app.use(timeout(120000));
 app.listen(process.env.PORT || 3000, function () {
   console.log('Listening on port 3000');
 });

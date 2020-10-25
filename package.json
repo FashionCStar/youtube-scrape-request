@@ -8,6 +8,8 @@
         "cheerio": "latest",
         "express": "latest",
         "fs": "0.0.1-security",
-        "request": "latest"
+        "request": "latest",
+        "connect-timeout": "^1.9.0",
+        "cors": "^2.8.5"
     }
 }
