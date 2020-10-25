@@ -92,7 +92,6 @@ async function youtube(query, key, pageToken) {
  */
 function parseOldFormat($, vid) {
     // Get video details
-    console.log("=================parse old formats");
     let $metainfo = $(vid).find(".yt-lockup-meta-info li");
     let $thumbnail = $(vid).find(".yt-thumb img");
     let video = {
@@ -124,7 +123,6 @@ function parseOldFormat($, vid) {
  * @param {Object} json - The object being returned to caller
  */
 function parseJsonFormat(contents, json) {
-    console.log("++++++++++++++parse json format");
     contents.forEach(sectionList => {
         try {
             if (sectionList.hasOwnProperty("itemSectionRenderer")) {
@@ -232,25 +230,21 @@ function parseRadioRenderer(renderer) {
  * @returns object with data to return for this video
  */
 function parseVideoRenderer(renderer) {
-    fs.writeFile('json-videorender.json', renderer, (error) => { 
-        console.log("errorrrrr", error); 
-        if (error) throw error;
-            console.log('saved file');
-    });
     let video = {
         "id": renderer.videoId,
+        "link": `https://www.youtube.com${renderer.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
+        "thumbnail_src": renderer.thumbnail.thumbnails[renderer.thumbnail.thumbnails.length - 1].url,
         "title": renderer.title.runs.reduce(comb, ""),
-        "url": `https://www.youtube.com${renderer.navigationEndpoint.commandMetadata.webCommandMetadata.url}`,
         "duration": renderer.lengthText ? renderer.lengthText.simpleText : "Live",
         "snippet": renderer.descriptionSnippet ?
                    renderer.descriptionSnippet.runs.reduce((a, b) => a + (b.bold ? `<b>${b.text}</b>` : b.text), ""):
                    "",
-        "upload_date": renderer.publishedTimeText ? renderer.publishedTimeText.simpleText : "Live",
-        "thumbnail_src": renderer.thumbnail.thumbnails[renderer.thumbnail.thumbnails.length - 1].url,
-        "views": renderer.viewCountText ?
+        "release_date": renderer.publishedTimeText ? renderer.publishedTimeText.simpleText : "Live",
+        "num_views": renderer.viewCountText ?
             renderer.viewCountText.simpleText || renderer.viewCountText.runs.reduce(comb, "") :
             (renderer.publishedTimeText ? "0 views" : "0 watching")
     };
+    console.log("+++++++++++++++", renderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer);
 
     let uploader = {
         "username": renderer.ownerText.runs[0].text,
