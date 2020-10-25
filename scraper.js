@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const request = require('request');
+const fs = require('fs');
 
 async function youtube(query, key, pageToken) {
     return new Promise((resolve, reject) => {
@@ -22,7 +23,7 @@ async function youtube(query, key, pageToken) {
                     continuation: pageToken
                 },
             }, (error, response, body) => {
-                console.log(body);
+                console.log("next page token body result");
 
                 if (!error && response.statusCode === 200) {
                     parseJsonFormat(body.onResponseReceivedCommands[0].appendContinuationItemsAction.continuationItems, json);
@@ -91,6 +92,7 @@ async function youtube(query, key, pageToken) {
  */
 function parseOldFormat($, vid) {
     // Get video details
+    console.log("=================parse old formats");
     let $metainfo = $(vid).find(".yt-lockup-meta-info li");
     let $thumbnail = $(vid).find(".yt-thumb img");
     let video = {
@@ -122,6 +124,12 @@ function parseOldFormat($, vid) {
  * @param {Object} json - The object being returned to caller
  */
 function parseJsonFormat(contents, json) {
+    console.log("++++++++++++++parse json format");
+    fs.writeFile('json-contents.json', contents, (error) => { 
+        console.log("errorrrrr", error); 
+        if (error) throw error;
+            console.log('saved file');
+    });
     contents.forEach(sectionList => {
         try {
             if (sectionList.hasOwnProperty("itemSectionRenderer")) {
