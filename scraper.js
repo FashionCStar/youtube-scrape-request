@@ -23,7 +23,6 @@ async function youtube(query, key, pageToken) {
                     continuation: pageToken
                 },
             }, (error, response, body) => {
-                console.log("next page token body result");
 
                 if (!error && response.statusCode === 200) {
                     parseJsonFormat(body.onResponseReceivedCommands[0].appendContinuationItemsAction.continuationItems, json);

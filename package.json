@@ -3,7 +3,7 @@
     "version": "0.1.2",
     "description": "Scrape YouTube searches",
     "main": "server.js",
-    "author": "Herman Fassett",
+    "author": "Akira Yoshino",
     "dependencies": {
         "cheerio": "latest",
         "express": "latest",
